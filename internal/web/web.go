@@ -10,17 +10,25 @@ import (
 )
 
 func handleRequest(w http.ResponseWriter, r *http.Request, tm *tunnel.TunnelManager) {
-	w.Header().Set("Content-Disposition", "attachment; filename=lockbox.bin")
-	w.Header().Set("Content-Type", "application/octet-stream")
-
 	idstr := r.URL.Query().Get("id")
-	id, _ := strconv.Atoi(idstr)
+	id, err := strconv.Atoi(idstr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	currentTunnel, ok := tm.GetTunnel(id)
 	if !ok {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	sendResponse(w, currentTunnel)
+}
+
+func sendResponse(w http.ResponseWriter, currentTunnel chan tunnel.Tunnel) {
+	w.Header().Set("Content-Disposition", "attachment; filename=lockbox.bin")
+	w.Header().Set("Content-Type", "application/octet-stream")
+
 	donech := make(chan struct{})
 	currentTunnel <- tunnel.Tunnel{
 		W:      w,
