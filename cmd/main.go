@@ -9,5 +9,5 @@ import (
 func main() {
 	tm := tunnel.NewTunnelManager()
 	go func() { web.StartServer(tm) }()
-	ssh.StartServer(tm)
+	ssh.NewServer("0.0.0.0:2222", tm).ListenAndServe()
 }
