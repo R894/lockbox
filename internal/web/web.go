@@ -16,7 +16,6 @@ func handleRequest(w http.ResponseWriter, r *http.Request, tm *tunnel.TunnelMana
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
 	currentTunnel, ok := tm.GetTunnel(id)
 	if !ok {
 		w.WriteHeader(http.StatusNotFound)
@@ -26,7 +25,8 @@ func handleRequest(w http.ResponseWriter, r *http.Request, tm *tunnel.TunnelMana
 }
 
 func sendResponse(w http.ResponseWriter, currentTunnel chan tunnel.Tunnel) {
-	w.Header().Set("Content-Disposition", "attachment; filename=lockbox.bin")
+	tunn := <-currentTunnel
+	w.Header().Set("Content-Disposition", "attachment; filename="+tunn.Filename)
 	w.Header().Set("Content-Type", "application/octet-stream")
 
 	donech := make(chan struct{})
@@ -37,10 +37,10 @@ func sendResponse(w http.ResponseWriter, currentTunnel chan tunnel.Tunnel) {
 	<-donech
 }
 
-func StartServer(tm *tunnel.TunnelManager) {
+func StartServer(addr string, tm *tunnel.TunnelManager) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		handleRequest(w, r, tm)
 	})
-	fmt.Println("http server is ready")
-	log.Fatal(http.ListenAndServe(":3000", nil))
+	fmt.Println("HTTP server running on ", addr)
+	log.Fatal(http.ListenAndServe(addr, nil))
 }

@@ -16,7 +16,7 @@ func TestSendFileToTunnel(t *testing.T) {
 		W: &bytes.Buffer{},
 	}
 
-	err := sendFileToTunnel("test.txt", sessionReader, tunnel)
+	err := sendFileToTunnel(sessionReader, tunnel)
 	assert.NoError(t, err)
 
 	assert.Equal(t, sessionData, tunnel.W.(*bytes.Buffer).Bytes())
