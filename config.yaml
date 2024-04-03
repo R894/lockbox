@@ -1,2 +1,7 @@
-host: localhost
-port: 2222
+web:
+  host: localhost
+  port: 3000
+
+ssh:
+  host: 0.0.0.0
+  port: 2222
