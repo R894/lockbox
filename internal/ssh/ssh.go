@@ -38,36 +38,39 @@ func (l *LockBox) Close() error {
 }
 
 func handleRequest(s ssh.Session, tm *tunnel.TunnelManager) {
+	// TODO: Figure out a better way to issue id
 	id := rand.Intn(math.MaxInt)
 	s.Write(([]byte)(fmt.Sprintf("LockBox link: http://localhost:3000?id=%d\n", id)))
 	s.Write(([]byte)("Session is in progress... Waiting for user to connect and download\n"))
 
 	currentTunnel := tm.AddTunnel(id)
-	donech := make(chan struct{})
-	currentTunnel <- tunnel.Tunnel{
-		Filename: s.RawCommand(),
-		Donech:   donech,
-	}
+	sendFilenameToTunnel(s.RawCommand(), currentTunnel)
 
-	tunnelChanAfterLinkClicked, _ := tm.GetTunnel(id)
-	tunnelAfterLinkClicked := <-tunnelChanAfterLinkClicked
-	defer close(tunnelAfterLinkClicked.Donech)
-	err := sendFileToTunnel(s, &tunnelAfterLinkClicked)
+	ct := <-currentTunnel
+	defer close(ct.Donech)
 
+	err := startFileTransfer(s, &ct)
 	if err != nil {
 		log.Fatal(err)
 		s.Write(([]byte)("Something went wrong!\n"))
 		return
 	}
+
 	s.Write(([]byte)("File sent successfully, thanks for using LockBox!\n"))
 }
 
-func sendFileToTunnel(session io.Reader, tunnel *tunnel.Tunnel) error {
-	fmt.Println("Inside sendFileToTunnel")
+func startFileTransfer(session io.Reader, tunnel *tunnel.Tunnel) error {
 	_, err := io.Copy(tunnel.W, session)
 	if err != nil {
 		return err
 	}
-	fmt.Println("File sent successfully")
 	return nil
+}
+
+func sendFilenameToTunnel(filename string, currentTunnel chan tunnel.Tunnel) {
+	donech := make(chan struct{})
+	currentTunnel <- tunnel.Tunnel{
+		Filename: filename,
+		Donech:   donech,
+	}
 }

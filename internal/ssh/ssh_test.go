@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSendFileToTunnel(t *testing.T) {
+func TestFileTransfer(t *testing.T) {
 	sessionData := []byte("Test data")
 	sessionReader := bytes.NewReader(sessionData)
 
@@ -16,7 +16,7 @@ func TestSendFileToTunnel(t *testing.T) {
 		W: &bytes.Buffer{},
 	}
 
-	err := sendFileToTunnel(sessionReader, tunnel)
+	err := startFileTransfer(sessionReader, tunnel)
 	assert.NoError(t, err)
 
 	assert.Equal(t, sessionData, tunnel.W.(*bytes.Buffer).Bytes())
