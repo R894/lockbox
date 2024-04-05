@@ -13,9 +13,10 @@ type webserver struct {
 	Addr string
 }
 type ssh struct {
-	Host string
-	Port int
-	Addr string
+	Host    string
+	Port    int
+	Addr    string
+	KeyPath string
 }
 
 type Config struct {
@@ -32,9 +33,10 @@ func LoadConfig() *Config {
 			Addr: fmt.Sprintf("%s:%d", viper.GetString("web.host"), viper.GetInt("web.port")),
 		},
 		SSH: ssh{
-			Host: viper.GetString("ssh.host"),
-			Port: viper.GetInt("ssh.port"),
-			Addr: fmt.Sprintf("%s:%d", viper.GetString("ssh.host"), viper.GetInt("ssh.port")),
+			Host:    viper.GetString("ssh.host"),
+			Port:    viper.GetInt("ssh.port"),
+			Addr:    fmt.Sprintf("%s:%d", viper.GetString("ssh.host"), viper.GetInt("ssh.port")),
+			KeyPath: viper.GetString("ssh.keypath"),
 		},
 	}
 }

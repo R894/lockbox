@@ -12,7 +12,8 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 	tm := tunnel.NewTunnelManager()
+	keyPath := cfg.SSH.KeyPath
 
 	go func() { web.StartServer(cfg.Web.Addr, tm) }()
-	log.Fatal(ssh.NewServer(cfg.SSH.Addr, tm).ListenAndServe())
+	log.Fatal(ssh.NewServer(cfg.SSH.Addr, tm, keyPath).ListenAndServe())
 }

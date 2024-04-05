@@ -6,10 +6,12 @@ import (
 	"log"
 	"math"
 	"math/rand"
+	"os"
 
 	"github.com/R894/lockbox/internal/tunnel"
 
 	"github.com/gliderlabs/ssh"
+	gossh "golang.org/x/crypto/ssh"
 )
 
 type LockBox struct {
@@ -17,9 +19,16 @@ type LockBox struct {
 	tm     *tunnel.TunnelManager
 }
 
-func NewServer(addr string, tm *tunnel.TunnelManager) *LockBox {
+func NewServer(addr string, tm *tunnel.TunnelManager, privateKeyPath string) *LockBox {
+	var hostSigners []ssh.Signer
+
+	if privateKeyPath != "" {
+		hostSigners = createHostSigners(privateKeyPath)
+	}
+
 	return &LockBox{server: &ssh.Server{
-		Addr: addr,
+		Addr:        addr,
+		HostSigners: hostSigners,
 	},
 		tm: tm,
 	}
@@ -73,4 +82,19 @@ func sendFilenameToTunnel(filename string, currentTunnel chan tunnel.Tunnel) {
 		Filename: filename,
 		Donech:   donech,
 	}
+}
+
+func createHostSigners(privateKeyPath string) []ssh.Signer {
+	privateKeyBytes, err := os.ReadFile(privateKeyPath)
+	if err != nil {
+		log.Fatalf("Failed to read private key: %v", err)
+	}
+
+	signer, err := gossh.ParsePrivateKey(privateKeyBytes)
+	if err != nil {
+		log.Fatalf("Failed to parse private key: %v", err)
+	}
+
+	hostSigners := []ssh.Signer{signer}
+	return hostSigners
 }
