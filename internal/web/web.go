@@ -25,8 +25,8 @@ func handleRequest(w http.ResponseWriter, r *http.Request, tm *tunnel.TunnelMana
 }
 
 func sendResponse(w http.ResponseWriter, currentTunnel chan tunnel.Tunnel) {
-	tunn := <-currentTunnel
-	w.Header().Set("Content-Disposition", "attachment; filename="+tunn.Filename)
+	recievedTunnel := <-currentTunnel
+	w.Header().Set("Content-Disposition", "attachment; filename="+recievedTunnel.Filename)
 	w.Header().Set("Content-Type", "application/octet-stream")
 
 	donech := make(chan struct{})
