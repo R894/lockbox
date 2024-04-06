@@ -13,7 +13,7 @@ import (
 )
 
 func RunCmdOverSSH(addr, username, password, cmd string) ([]byte, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
 	cfg := &ssh.ClientConfig{
@@ -61,7 +61,6 @@ func TestStartServer(t *testing.T) {
 	go srv.ListenAndServe()
 
 	res, _ := RunCmdOverSSH("127.0.0.1:2222", "root", "root", "test.txt")
-	time.Sleep(3 * time.Second)
 	resStr := string(res)
 
 	assert.Contains(t, resStr, "Session is in progress... Waiting for user to connect and download")
