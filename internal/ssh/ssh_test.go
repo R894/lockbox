@@ -13,7 +13,7 @@ import (
 )
 
 func RunCmdOverSSH(addr, username, password, cmd string) ([]byte, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	cfg := &ssh.ClientConfig{
@@ -59,7 +59,7 @@ func TestStartServer(t *testing.T) {
 	tm := tunnel.NewTunnelManager()
 	srv := NewServer("127.0.0.1:2222", tm, "")
 	go srv.ListenAndServe()
-
+	time.Sleep(2 * time.Second)
 	res, _ := RunCmdOverSSH("127.0.0.1:2222", "root", "root", "test.txt")
 	resStr := string(res)
 	fmt.Println("got string: ", resStr)
