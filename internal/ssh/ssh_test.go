@@ -62,6 +62,6 @@ func TestStartServer(t *testing.T) {
 
 	res, _ := RunCmdOverSSH("127.0.0.1:2222", "root", "root", "test.txt")
 	resStr := string(res)
-
+	fmt.Println(resStr)
 	assert.Contains(t, resStr, "Session is in progress... Waiting for user to connect and download")
 }
