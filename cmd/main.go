@@ -10,10 +10,14 @@ import (
 )
 
 func main() {
-	cfg := config.LoadConfig()
-	tm := tunnel.NewTunnelManager()
-	keyPath := cfg.SSH.KeyPath
+	var (
+		cfg           *config.Config        = config.LoadConfig()
+		tunnelManager *tunnel.TunnelManager = tunnel.NewTunnelManager()
+		webAddr       string                = cfg.Web.Addr
+		sshAddr       string                = cfg.SSH.Addr
+		keyPath       string                = cfg.SSH.KeyPath
+	)
 
-	go func() { web.StartServer(cfg.Web.Addr, tm) }()
-	log.Fatal(ssh.NewServer(cfg.SSH.Addr, tm, keyPath).ListenAndServe())
+	go func() { web.StartServer(webAddr, tunnelManager) }()
+	log.Fatal(ssh.NewServer(sshAddr, tunnelManager, keyPath).ListenAndServe())
 }
