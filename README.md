@@ -9,6 +9,16 @@ Lockbox is a SSH file upload service that acts as a middleman, streaming the fil
 - Secure and encrypted transfers.
 - Fast and efficient transfers.
 
+## Installation
+Requirements: [Docker](https://www.docker.com/)
+
+1. Install the image
+
+    ``docker build -t lockbox .``
+2. Run the image in a container
+
+    ``docker run -p 2222:2222 -p 3000:3000 lockbox``
+
 ## Usage
 
 1. Start the server
